@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, font
 import re
-VERSION="1.0"
+VERSION="1.1"
 # --- Drag and Drop Support ---
 # This application uses tkinterdnd2 for drag-and-drop functionality.
 # If not installed, the feature will be disabled.
@@ -225,11 +225,10 @@ class SrtComparer(ttk.Frame):
 
         srt_content = []
         for item in self.modified_srt_data:
-            index = item['index']
-            if item['var'].get():
-                index = f"{index}-D"
-
-            srt_content.append(f"{index}\n{item['time']}\n{item['text']}")
+            # If the item is not marked for deletion, add it to the export list.
+            if not item['var'].get():
+                # Use the original index from the item; do not recalculate.
+                srt_content.append(f"{item['index']}\n{item['time']}\n{item['text']}")
 
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write('\n\n'.join(srt_content) + '\n')
@@ -261,7 +260,8 @@ if __name__ == '__main__':
     else:
         root = tk.Tk()
         # Only show message if the app is started, not on import
-        root.after(100, lambda: messagebox.showinfo("Info", "Drag and drop is disabled.\nPlease install tkinterdnd2 (`pip install tkinterdnd2`) to enable it."))
+        root.after(100, lambda: messagebox.showinfo("Info", "Drag and drop is disabled.\n" +
+                                             "Please install tkinterdnd2 (`pip install tkinterdnd2`) to enable it."))
 
     root.geometry("900x700")
     app = SrtComparer(master=root)
